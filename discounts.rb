@@ -65,8 +65,8 @@ module Rule
 
   class Base
 
-    def update(order)
-      order.total = order.items.inject(0) { |sum, item| sum + item.price }
+    def update(checkout)
+      checkout.total = checkout.items.inject(0) { |sum, item| sum + item.price }
     end
 
   end
@@ -77,8 +77,8 @@ module Rule
       @product_code = product_code
     end
 
-    def update(order)
-      order.items.select { |product| product.code == @product_code }.
+    def update(checkout)
+      checkout.items.select { |product| product.code == @product_code }.
         map!.with_index { |product, index| product.price = 0.00 if index.odd? } #odd? becose start with 0
 
       super
@@ -94,9 +94,9 @@ module Rule
       @discount = discount
     end
 
-    def update(order)
-      if order.items.count { |product| product.code == @product_code } >= @min_count
-        order.items.select { |product| product.code == @product_code }.
+    def update(checkout)
+      if checkout.items.count { |product| product.code == @product_code } >= @min_count
+        checkout.items.select { |product| product.code == @product_code }.
           select { |product| product.price -= @discount }
       end
 
