@@ -105,24 +105,6 @@ module Rule
 
   end
 
-  class DiscountIfOneByeMoreCount < DiscountIfOneByeMore
-
-    def initialize(product_code:, min_count:, discount:)
-      super
-    end
-
-    def update(order)
-      if order.items.count { |product| product.price > 0 } >= @min_count
-        order.items.reject { |product| product.price.zero? }.
-          select { |product| product.code == @product_code }.
-            map! { |product| product.price -= @discount }
-      end
-
-      super
-    end
-
-  end
-
 end
 
 # Test
