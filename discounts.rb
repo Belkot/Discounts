@@ -10,8 +10,8 @@ class Checkout
   end
 
   def scan(product_code)
-    product = Inventory.get(product_code).dup
-    @items << product
+    product = Inventory.get(product_code)
+    @items << product.dup if product
   end
 
   def total
