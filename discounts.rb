@@ -1,7 +1,7 @@
 class Checkout
 
   attr_writer :total
-  attr_reader :items #attr_accessor :items
+  attr_reader :items
 
   def initialize(*args)
     @rules = []
@@ -61,62 +61,66 @@ module Inventory
 
 end
 
-class RuleBase
+module Rule
 
-  def update(order)
-    order.total = order.items.inject(0) { |sum, item| sum + item.price }
+  class Base
+
+    def update(order)
+      order.total = order.items.inject(0) { |sum, item| sum + item.price }
+    end
+
   end
 
-end
+  class ByOneGetOneFree < Base
 
-class RuleByOneGetOneFree < RuleBase
+    def initialize(product_code)
+      @product_code = product_code
+    end
 
-  def initialize(product_code)
-    @product_code = product_code
-  end
-
-  def update(order)
-    order.items.select { |product| product.code == @product_code }.
-      map!.with_index { |product, index| product.price = 0.00 if index.odd? } #odd? becose start with 0
-
-    super
-  end
-
-end
-
-class RuleDiscountIfOneByeMore < RuleBase
-
-  def initialize(product_code:, min_count:, discount:)
-    @product_code = product_code
-    @min_count = min_count
-    @discount = discount
-  end
-
-  def update(order)
-    if order.items.count { |product| product.code == @product_code } >= @min_count
+    def update(order)
       order.items.select { |product| product.code == @product_code }.
-        select { |product| product.price -= @discount }
+        map!.with_index { |product, index| product.price = 0.00 if index.odd? } #odd? becose start with 0
+
+      super
     end
 
-    super
   end
 
-end
+  class DiscountIfOneByeMore < Base
 
-class RuleDiscountIfOneByeMoreCount < RuleDiscountIfOneByeMore
-
-  def initialize(product_code:, min_count:, discount:)
-    super
-  end
-
-  def update(order)
-    if order.items.count { |product| product.price > 0 } >= @min_count
-      order.items.reject { |product| product.price.zero? }.
-        select { |product| product.code == @product_code }.
-          map! { |product| product.price -= @discount }
+    def initialize(product_code:, min_count:, discount:)
+      @product_code = product_code
+      @min_count = min_count
+      @discount = discount
     end
 
-    super
+    def update(order)
+      if order.items.count { |product| product.code == @product_code } >= @min_count
+        order.items.select { |product| product.code == @product_code }.
+          select { |product| product.price -= @discount }
+      end
+
+      super
+    end
+
+  end
+
+  class DiscountIfOneByeMoreCount < DiscountIfOneByeMore
+
+    def initialize(product_code:, min_count:, discount:)
+      super
+    end
+
+    def update(order)
+      if order.items.count { |product| product.price > 0 } >= @min_count
+        order.items.reject { |product| product.price.zero? }.
+          select { |product| product.code == @product_code }.
+            map! { |product| product.price -= @discount }
+      end
+
+      super
+    end
+
   end
 
 end
@@ -133,8 +137,8 @@ describe 'Discounts' do
   Inventory.add(cf)
   Inventory.add(aj)
 
-  rule1 = RuleByOneGetOneFree.new('FR')
-  rule2 = RuleDiscountIfOneByeMore.new(product_code: 'SR', min_count: 3, discount: 0.50)
+  rule1 = Rule::ByOneGetOneFree.new('FR')
+  rule2 = Rule::DiscountIfOneByeMore.new(product_code: 'SR', min_count: 3, discount: 0.50)
 
   it 'valid example1' do
     co = Checkout.new(rule1, rule2)
