@@ -28,6 +28,10 @@ module Inventory
 
   class << self
 
+    def all
+      @@products
+    end
+
     def add(product)
       if @@products.count { |e| e.code == product.code}.zero?
         @@products << product.dup
