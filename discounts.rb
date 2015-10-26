@@ -21,18 +21,6 @@ class Checkout
 
 end
 
-class Product
-
-  attr_reader :code, :name
-  attr_accessor :price
-
-  def initialize(code:, name:, price:)
-    @code = code
-    @name = name
-    @price = price
-  end
-
-end
 
 module Inventory
 
@@ -55,6 +43,19 @@ module Inventory
 
     def remove(code)
       @@products.delete_if { |product| product.code == code }
+    end
+
+  end
+
+  class Product
+
+    attr_reader :code, :name
+    attr_accessor :price
+
+    def initialize(code:, name:, price:)
+      @code = code
+      @name = name
+      @price = price
     end
 
   end
@@ -110,10 +111,10 @@ end
 # Test
 describe 'Discounts' do
 
-  fr = Product.new(code: 'FR', name: 'Fruit Tea', price: 3.11)
-  sr = Product.new(code: 'SR', name: 'Strawberries', price: 5.00)
-  cf = Product.new(code: 'CF', name: 'Coffe', price: 11.23)
-  aj = Product.new(code: 'AJ', name: 'Apple Juice',  price: 7.25)
+  fr = Inventory::Product.new(code: 'FR', name: 'Fruit Tea', price: 3.11)
+  sr = Inventory::Product.new(code: 'SR', name: 'Strawberries', price: 5.00)
+  cf = Inventory::Product.new(code: 'CF', name: 'Coffe', price: 11.23)
+  aj = Inventory::Product.new(code: 'AJ', name: 'Apple Juice',  price: 7.25)
   Inventory.add(fr)
   Inventory.add(sr)
   Inventory.add(cf)
