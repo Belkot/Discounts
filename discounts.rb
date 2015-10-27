@@ -15,7 +15,7 @@ class Checkout
   end
 
   def total
-    @rules.each{ |rule| rule.update self }
+    @rules.each { |rule| rule.update self }
     @total
   end
 
