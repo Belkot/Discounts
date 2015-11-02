@@ -1,6 +1,8 @@
-require './discounts.rb'
+require './checkout.rb'
+require './inventory.rb'
+require './rule.rb'
 
-describe 'Discounts' do
+describe 'Checkout' do
 
   fr = Inventory::Product.new(code: 'FR', name: 'Fruit Tea', price: 3.11)
   sr = Inventory::Product.new(code: 'SR', name: 'Strawberries', price: 5.00)
